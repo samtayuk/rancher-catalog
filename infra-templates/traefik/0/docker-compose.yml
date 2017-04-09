@@ -1,0 +1,25 @@
+version: '2'
+services:
+  traefik:
+    image: samtayuk/traefik-rancher
+
+    environment:
+      TRAEFIK_ACME_ENABLE: 'true'
+      TRAEFIK_ACME_EMAIL: samtaylor.uk@gmail.com
+      TRAEFIK_HTTPS_ENABLE: 'true'
+
+    volumes:
+      - /app/traefik/acme
+
+    ports:
+      - ${admin_port}:8000/tcp
+      - ${http_port}:80/tcp
+      - ${https_port}:443/tcp
+
+    labels:
+      io.rancher.scheduler.global: 'true'
+      io.rancher.scheduler.affinity:host_label: ${host_label}
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+      io.rancher.container.hostname_override: container_name
+      io.rancher.container.create_agent: true
+      io.rancher.container.agent.role: environment
